@@ -1,29 +1,22 @@
-import glob
+from re import sub
+from pathlib import Path
+from typing import Set
+samples_path:  Path = Path('wavs')
+list_path:  Path = Path('list.txt')
 
-samples_path = ""       # Paste here directory to wav (samples) files folder.
-transcription_path = ""   # Paste the path to the.txt file here with the transcription like: C:\\Users\\YourName\\....\\transcription.txt
+samples: Set[str] = {str(i).replace('\\','/') for i in samples_path.iterdir() if i.is_file()}
+with open(list_path, 'r', encoding='utf8') as f: 
+    files_in_list: Set[str] = {sub(r"\|.+","", i).strip() for i in f.readlines()}
 
-samples_path = samples_path + "*"
 
-x = 0
-not_found_wav = []
+common_part: Set[str]= samples.intersection(files_in_list)
+missing_files: Set[str] = files_in_list.difference(common_part)
+redundant_files: Set[str] = samples.difference(common_part)
 
-while True:
-    with open(transcription_path) as transcription_list:
-        try:
-            exist_check = transcription_list.read().split("\n")[x]
-        except(IndexError):
-            if x == 0:
-                print("Probably valid transcription file not found !")
-            elif len(not_found_wav) == 0 and 0 <= x:
-                print("All files are in transcription !")
-            else:
-                print("These files were not found in the transcription file: " + str(not_found_wav))
-            exit()
+if missing_files: 
+    print("Files in transcript, which doesn't exists: ",*missing_files , sep='\n', end='\n'*2)
+if redundant_files: 
+    print("Files not in list: ", *redundant_files, sep='\n', end='\n'*2)
 
-        if exist_check in glob.glob(samples_path):
-            ''
-        else:
-            not_found_wav.append(exist_check)
-
-        x = x + 1
+if not redundant_files and not missing_files: 
+    print("All good")
