@@ -5,17 +5,17 @@ transcription_path = ""   # Paste the path to the.txt file here with the transcr
 
 samples_path = samples_path + "*"
 
-x = 0
+check_next_line = 0
 not_found_wav = []
 
 while True:
     with open(transcription_path) as transcription_list:
         try:
-            exist_check = transcription_list.read().split("\n")[x]
+            exist_check = transcription_list.read().split("\n")[check_next_line]
         except(IndexError):
-            if x == 0:
+            if check_next_line == 0:
                 print("Probably valid transcription file not found !")
-            elif len(not_found_wav) == 0 and 0 <= x:
+            elif len(not_found_wav) == 0 and 0 <= check_next_line:
                 print("All files are in transcription !")
             else:
                 print("These files were not found in the transcription file: " + str(not_found_wav))
@@ -26,4 +26,4 @@ while True:
         else:
             not_found_wav.append(exist_check)
 
-        x = x + 1
+        check_next_line = check_next_line + 1
